@@ -3,9 +3,8 @@ mod files;
 mod network;
 mod receive;
 
-use axum::{extract::DefaultBodyLimit, Router};
+use axum::Router;
 use clap::Parser;
-use tower_http::limit::RequestBodyLimitLayer;
 
 use crate::cli::{Cli, Commands};
 use crate::network::{find_available_port, is_port_available, LOCALHOST};
@@ -31,13 +30,7 @@ async fn main() {
     };
 
     // build app router
-    let app = Router::new()
-        .layer(DefaultBodyLimit::disable())
-        .layer(RequestBodyLimitLayer::new(
-            250 * 1024 * 1024, /* 250mb */
-        ))
-        .layer(tower_http::trace::TraceLayer::new_for_http())
-        .merge(receive::router());
+    let app = Router::new().merge(receive::router());
 
     let server_address = format!("{LOCALHOST}:{server_port}");
     println!("Server launched on {server_address}");
