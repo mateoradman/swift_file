@@ -23,11 +23,19 @@ pub fn is_port_available(port: u16) -> bool {
     TcpListener::bind(addr).is_ok()
 }
 
-pub fn find_available_port() -> u16 {
-    for port in PORT_RANGE {
-        if is_port_available(port) {
-            return port;
+pub fn find_available_port(server_port: &mut u16, user_port: &Option<u16>) {
+    if let Some(port) = user_port {
+        if is_port_available(*port) {
+            *server_port = *port;
+            return;
         }
     }
+    for port in PORT_RANGE {
+        if is_port_available(port) {
+            *server_port = port;
+            return;
+        }
+    }
+
     panic!("Unable to find an available port on the system.")
 }
