@@ -6,6 +6,7 @@ use qrcode::QrCode;
 
 use axum::{
     extract::{DefaultBodyLimit, Multipart},
+    http::StatusCode,
     response::Html,
     routing::get,
     Router,
@@ -83,7 +84,7 @@ async fn show_form() -> Html<&'static str> {
     )
 }
 
-async fn accept_form(mut multipart: Multipart) {
+async fn accept_form(mut multipart: Multipart) -> StatusCode {
     while let Some(field) = multipart.next_field().await.unwrap() {
         let file_name = field.file_name().unwrap().to_string();
         let content_type = field.content_type().unwrap().to_string();
@@ -99,6 +100,7 @@ async fn accept_form(mut multipart: Multipart) {
             dest_path
         );
     }
+    StatusCode::OK
 }
 
 pub fn generate_receive_qr_code(port: u16) {
