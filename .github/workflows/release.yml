@@ -1,3 +1,5 @@
+name: Release Workflow - Swift File
+
 on:
   release:
     types: [created]
