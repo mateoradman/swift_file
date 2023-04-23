@@ -1,9 +1,9 @@
 [package]
-author = "Mateo Radman"
+authors = ["Mateo Radman <radmanmateo@gmail.com>"]
 name = "swift_file"
 version = "0.1.0"
 edition = "2021"
-about = "Send or receive files between devices using Wi-Fi network"
+description = "Send or receive files between devices using Wi-Fi network"
 license = "MIT"
 
 [[bin]]
