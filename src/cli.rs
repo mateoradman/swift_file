@@ -16,11 +16,13 @@ pub enum Commands {
         /// File to send
         file: PathBuf,
         #[arg(short, long, value_parser = port_in_range)]
+        /// Port on which the server will run (8000-9000)
         port: Option<u16>,
     },
     /// Receive a file
     Receive {
         #[arg(short, long, value_parser = port_in_range)]
+        /// Port on which the server will run (8000-9000)
         port: Option<u16>,
     },
 }
