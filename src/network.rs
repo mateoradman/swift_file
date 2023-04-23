@@ -39,3 +39,25 @@ pub fn find_available_port(server_port: &mut u16, user_port: &Option<u16>) {
 
     panic!("Unable to find an available port on the system.")
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_port_in_range_fails() {
+        assert!(port_in_range("9999999999").is_err());
+    }
+
+    #[test]
+    fn test_port_in_range() {
+        assert!(port_in_range("8300").is_ok());
+    }
+
+    #[test]
+    fn test_find_available_port() {
+        let mut server_port: u16 = 0;
+        find_available_port(&mut server_port, &None);
+        assert!(port_in_range(&server_port.to_string()).is_ok());
+    }
+}
