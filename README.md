@@ -15,8 +15,8 @@ The maximum data that can be sent with each request is 1GB.
 
 ## Installation
 
-
 ## Usage
+
 ```
 Usage: sf <COMMAND>
 
@@ -28,4 +28,31 @@ Commands:
 Options:
   -h, --help     Print help
   -V, --version  Print version
+```
+
+### Sending a file to another device
+
+```
+Send a file
+
+Usage: sf send [OPTIONS] <FILE>
+
+Arguments:
+  <FILE>  File path to send
+
+Options:
+  -p, --port <PORT>  Port to bind the server to (allowed user port range 1024 to 49151)
+  -h, --help         Print help
+```
+
+### Receiving a file from another device
+
+```
+Receive a file
+
+Usage: sf receive [OPTIONS]
+
+Options:
+  -p, --port <PORT>  Port to bind the server to (allowed user port range 1024 to 49151)
+  -h, --help         Print help
 ```
