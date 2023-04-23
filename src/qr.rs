@@ -2,7 +2,7 @@ use local_ip_address::local_ip;
 use qrcode::render::unicode;
 use qrcode::QrCode;
 
-pub fn generate_qr_code(port: u16, route: &str) {
+pub fn generate_qr_code(port: &u16, route: &str) {
     let machine_ip = local_ip().unwrap().to_string();
     let complete_url = format!("http://{machine_ip}:{port}{route}");
     println!("URL: {complete_url}");

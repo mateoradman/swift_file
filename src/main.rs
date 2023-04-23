@@ -32,24 +32,7 @@ async fn main() {
 
     let cli_args = Cli::parse();
     let mut server_port: u16 = 0;
-    match &cli_args.command {
-        Commands::Send { file, port } => {
-            find_available_port(&mut server_port, port);
-            let uuid = Uuid::new_v4().to_string();
-            shared_state
-                .uuid_path_map
-                .lock()
-                .expect("shared state was poisoned")
-                .insert(uuid.clone(), file.clone());
-            let route = format!("/download/{}", uuid);
-            generate_qr_code(server_port, &route);
-        }
-        Commands::Receive { port } => {
-            find_available_port(&mut server_port, port);
-            // generate scannable QR code
-            generate_qr_code(server_port, "/receive");
-        }
-    };
+    run_selected_action(&cli_args, &mut server_port, &shared_state);
 
     // build app router
     let app = build_router(shared_state);
@@ -71,4 +54,25 @@ fn build_router(shared_state: AppState) -> Router {
         .nest("/", send::router())
         .merge(receive::router())
         .with_state(shared_state)
+}
+
+fn run_selected_action(cli_args: &Cli, server_port: &mut u16, shared_state: &AppState) {
+    match &cli_args.command {
+        Commands::Send { file, port } => {
+            find_available_port(server_port, port);
+            let uuid = Uuid::new_v4().to_string();
+            shared_state
+                .uuid_path_map
+                .lock()
+                .expect("shared state was poisoned")
+                .insert(uuid.clone(), file.clone());
+            let route = format!("/download/{}", uuid);
+            generate_qr_code(server_port, &route);
+        }
+        Commands::Receive { port } => {
+            find_available_port(server_port, port);
+            // generate scannable QR code
+            generate_qr_code(server_port, "/receive");
+        }
+    };
 }
