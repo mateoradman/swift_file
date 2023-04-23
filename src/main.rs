@@ -45,7 +45,6 @@ async fn main() {
 
 fn build_router(shared_state: AppState) -> Router {
     Router::new()
-        .layer(tower_http::trace::TraceLayer::new_for_http())
         .nest("/", send::router())
         .merge(receive::router())
         .layer(DefaultBodyLimit::max(CONTENT_LENGTH_LIMIT))
@@ -71,4 +70,15 @@ fn run_selected_action(cli_args: &Cli, server_port: &mut u16, shared_state: &App
             generate_qr_code(server_port, "/receive");
         }
     };
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn verify_cli() {
+        use clap::CommandFactory;
+        Cli::command().debug_assert()
+    }
 }
