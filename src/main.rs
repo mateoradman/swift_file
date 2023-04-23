@@ -10,12 +10,11 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
 use crate::cli::{Cli, Commands};
-use crate::network::{find_available_port, LOCALHOST};
+use crate::network::{find_available_port, CONTENT_LENGTH_LIMIT, LOCALHOST};
 use crate::qr::generate_qr_code;
 use axum::extract::DefaultBodyLimit;
 use axum::Router;
 use clap::Parser;
-use tower_http::limit::RequestBodyLimitLayer;
 use uuid::Uuid;
 
 #[derive(Debug, Clone)]
@@ -46,13 +45,10 @@ async fn main() {
 
 fn build_router(shared_state: AppState) -> Router {
     Router::new()
-        .layer(DefaultBodyLimit::disable())
-        .layer(RequestBodyLimitLayer::new(
-            250 * 1024 * 1024, /* 250mb */
-        ))
         .layer(tower_http::trace::TraceLayer::new_for_http())
         .nest("/", send::router())
         .merge(receive::router())
+        .layer(DefaultBodyLimit::max(CONTENT_LENGTH_LIMIT))
         .with_state(shared_state)
 }
 

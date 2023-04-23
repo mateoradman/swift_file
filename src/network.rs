@@ -2,6 +2,7 @@ use std::{net::TcpListener, ops::RangeInclusive};
 
 const PORT_RANGE: RangeInclusive<u16> = 1024..=49151; // user port range
 pub const LOCALHOST: &str = "0.0.0.0";
+pub const CONTENT_LENGTH_LIMIT: usize = 1024 * 1024 * 1024; /* 1gb */
 
 pub fn port_in_range(s: &str) -> Result<u16, String> {
     let port: u16 = s
