@@ -5,8 +5,14 @@ version = "0.1.0"
 edition = "2021"
 description = "Send or receive files between devices using Wi-Fi network"
 license = "MIT"
+documentation = "https://github.com/mateoradman/swift_file"
+homepage = "https://github.com/mateoradman/swift_file"
+repository = "https://github.com/mateoradman/swift_file"
+keywords = ["cli", "file", "transfer"]
+categories = ["command-line-utilities", "file-transfer"]
 
 [[bin]]
+bench = false
 name = "sf"
 path = "src/main.rs"
 
