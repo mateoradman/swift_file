@@ -11,11 +11,27 @@ The QR code that is printed to stdout encodes a http url which is typically of t
 
 `http://{ip}:{port}/{send|receive}/[optional suffix]`
 
-The maximum data that can be sent with each request is 1GB.
+## Current limitations
 
-## Installation
+- The maximum data that can be sent with each request is 1GB which should satisfy most users.
+- Some browsers on iOS are unable to download the file. It always works with Safari but fails with Brave. The failed download might also occur on other Chromium-based iOS browsers.
 
-## Usage
+## Installation options
+
+### Install with cargo
+
+swift_file is published on crates.io (https://crates.io/crates/swift_file) and can be directly installed.
+
+```sh
+cargo install swift_file
+```
+
+### Manual installation from an archive
+
+[Releases](https://github.com/mateoradman/swift_file/releases) page provides an option to manually install the sf binary from an archive. The archive is available for Linux, MacOS, and Windows.
+Download, extract and move the binary to the desired directory, and set execution permissions.
+
+## CLI Usage
 
 ```
 Usage: sf <COMMAND>
