@@ -1,6 +1,11 @@
 use std::fs::write;
 
-use axum::{extract::Multipart, http::StatusCode, response::Html, routing::get, Router};
+use axum::{
+    extract::{Multipart, State},
+    response::{Html, Redirect},
+    routing::get,
+    Router,
+};
 
 use crate::{files::get_destination_path, AppState};
 
@@ -66,12 +71,12 @@ async fn show_form() -> Html<&'static str> {
     )
 }
 
-async fn accept_form(mut multipart: Multipart) -> StatusCode {
+async fn accept_form(State(state): State<AppState>, mut multipart: Multipart) -> Redirect {
     while let Some(field) = multipart.next_field().await.unwrap() {
         let file_name = field.file_name().unwrap().to_string();
         let content_type = field.content_type().unwrap().to_string();
         let data = field.bytes().await.unwrap();
-        let dest_path = get_destination_path(&file_name);
+        let dest_path = get_destination_path(&file_name, &state.destination_dir);
         write(&dest_path, &data).unwrap();
 
         println!(
@@ -82,5 +87,5 @@ async fn accept_form(mut multipart: Multipart) -> StatusCode {
             dest_path
         );
     }
-    StatusCode::OK
+    Redirect::to("/receive")
 }
