@@ -8,7 +8,7 @@ license = "MIT"
 documentation = "https://github.com/mateoradman/swift_file"
 homepage = "https://github.com/mateoradman/swift_file"
 repository = "https://github.com/mateoradman/swift_file"
-keywords = ["cli", "file", "transfer", "file-transfer", "axum", "api"]
+keywords = ["cli", "file-transfer", "axum", "api"]
 categories = ["command-line-utilities", "web-programming"]
 
 [[bin]]
