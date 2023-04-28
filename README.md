@@ -69,6 +69,7 @@ Receive a file
 Usage: sf receive [OPTIONS]
 
 Options:
-  -p, --port <PORT>  Port to bind the server to (allowed user port range 1024 to 49151)
-  -h, --help         Print help
+  -d, --dest-dir <DEST_DIR>  Destination directory (default: current working directory)
+  -p, --port <PORT>          Port to bind the server to (allowed user port range 1024 to 49151)
+  -h, --help                 Print help
 ```
