@@ -1,15 +1,15 @@
 [package]
 authors = ["Mateo Radman <radmanmateo@gmail.com>"]
 name = "swift_file"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2021"
 description = "Send or receive files between devices using Wi-Fi network"
 license = "MIT"
 documentation = "https://github.com/mateoradman/swift_file"
 homepage = "https://github.com/mateoradman/swift_file"
 repository = "https://github.com/mateoradman/swift_file"
-keywords = ["cli", "file", "transfer"]
-categories = ["command-line-utilities", "file-transfer"]
+keywords = ["cli", "file", "transfer", "file-transfer", "axum", "api"]
+categories = ["command-line-utilities", "web-programming"]
 
 [[bin]]
 bench = false
