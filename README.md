@@ -69,7 +69,8 @@ Receive a file
 Usage: sf receive [OPTIONS]
 
 Options:
-  -d, --dest-dir <DEST_DIR>  Destination directory (default: current working directory)
+  -d, --dest-dir <DEST_DIR>  Destination directory
   -p, --port <PORT>          Port to bind the server to (allowed user port range 1024 to 49151)
+      --no-open              Disable opening the received file automatically using the system default program
   -h, --help                 Print help
 ```
