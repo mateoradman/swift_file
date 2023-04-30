@@ -77,15 +77,30 @@ async fn accept_form(State(state): State<AppState>, mut multipart: Multipart) ->
         let content_type = field.content_type().unwrap().to_string();
         let data = field.bytes().await.unwrap();
         let dest_path = get_destination_path(&file_name, &state.destination_dir);
-        write(&dest_path, &data).unwrap();
+        match write(&dest_path, &data) {
+            Ok(_) => println!(
+                "File `{}` with content type `{}`, size {} bytes has been transferred to {}",
+                file_name,
+                content_type,
+                data.len(),
+                dest_path
+            ),
+            Err(err) => println!(
+                "Unable to transfer file {} with content type {} and size {} to {} due to {}",
+                file_name,
+                content_type,
+                data.len(),
+                dest_path,
+                err
+            ),
+        }
 
-        println!(
-            "File `{}` with content type `{}`, size {} bytes has been transferred to {}",
-            file_name,
-            content_type,
-            data.len(),
-            dest_path
-        );
+        match opener::open(&dest_path) {
+            Ok(()) => println!("File opened using a default program."),
+            Err(err) => {
+                println!("Unable to open a file using the system default program due to {err}")
+            }
+        }
     }
     Redirect::to("/receive")
 }
