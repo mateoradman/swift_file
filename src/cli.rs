@@ -20,9 +20,11 @@ impl Cli {
             Commands::Send { file, port } => {
                 self.send(server_port, shared_state, file.clone(), port)
             }
-            Commands::Receive { dest_dir, port } => {
-                self.receive(server_port, shared_state, dest_dir, port)
-            }
+            Commands::Receive {
+                dest_dir,
+                port,
+                no_open,
+            } => self.receive(server_port, shared_state, dest_dir, port, no_open),
         };
     }
 
@@ -50,9 +52,11 @@ impl Cli {
         shared_state: &mut AppState,
         dest_dir: &Option<PathBuf>,
         port: &Option<u16>,
+        no_open: &bool,
     ) {
         find_available_port(server_port, port);
         shared_state.destination_dir = dest_dir.clone();
+        shared_state.auto_open = !no_open;
         generate_qr_code(server_port, "/receive");
     }
 }
@@ -76,5 +80,8 @@ pub enum Commands {
         #[arg(short, long, value_parser = port_in_range)]
         /// Port to bind the server to (allowed user port range 1024 to 49151)
         port: Option<u16>,
+        #[arg(long)]
+        /// Disable opening the received file automatically using the system default program
+        no_open: bool,
     },
 }

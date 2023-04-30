@@ -19,6 +19,7 @@ use clap::Parser;
 pub struct AppState {
     pub uuid_path_map: Arc<Mutex<HashMap<String, PathBuf>>>,
     pub destination_dir: Option<PathBuf>,
+    pub auto_open: bool,
 }
 
 #[tokio::main]
@@ -27,6 +28,7 @@ async fn main() {
     let mut shared_state = AppState {
         uuid_path_map: Arc::new(Mutex::new(HashMap::new())),
         destination_dir: None,
+        auto_open: true,
     };
 
     let cli_args = Cli::parse();
