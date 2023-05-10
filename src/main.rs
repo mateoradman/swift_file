@@ -10,7 +10,7 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
 use crate::cli::Cli;
-use crate::network::{CONTENT_LENGTH_LIMIT, LOCALHOST};
+use crate::network::LOCALHOST;
 use axum::extract::DefaultBodyLimit;
 use axum::Router;
 use clap::Parser;
@@ -38,7 +38,6 @@ async fn main() {
     // build app router
     let app = build_router(shared_state);
     let server_address = format!("{LOCALHOST}:{server_port}");
-    println!("Server launched on {server_address}");
     axum::Server::bind(&server_address.parse().unwrap())
         .serve(app.into_make_service())
         .await
@@ -49,7 +48,7 @@ fn build_router(shared_state: AppState) -> Router {
     Router::new()
         .nest("/", send::router())
         .merge(receive::router())
-        .layer(DefaultBodyLimit::max(CONTENT_LENGTH_LIMIT))
+        .layer(DefaultBodyLimit::disable())
         .with_state(shared_state)
 }
 
