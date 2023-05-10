@@ -14,62 +14,9 @@ pub fn router() -> Router<AppState> {
     Router::new().route("/receive", get(show_form).post(accept_form))
 }
 
+static HTML_FORM: &str = include_str!("./resources/form.html");
 async fn show_form() -> Html<&'static str> {
-    Html(
-        r#"
-    <!doctype html>
-    <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <title>Swift File</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    background-color: #f0f0f0;
-                }
-                form {
-                    margin: 48px;
-                    padding: 24px;
-                    background-color: #fff;
-                    border: 1px solid #ccc;
-                    border-radius: 5px;
-                }
-                label {
-                    display: block;
-                    margin-bottom: 10px;
-                    font-weight: bold;
-                }
-                input[type="file"] {
-                    display: block;
-                    margin-bottom: 10px;
-                    border: 1px solid #ccc;
-                    padding: 5px;
-                    border-radius: 5px;
-                }
-                input[type="submit"] {
-                    background-color: #4CAF50;
-                    color: #fff;
-                    border: none;
-                    padding: 10px 20px;
-                    border-radius: 5px;
-                    cursor: pointer;
-                }
-            </style>
-        </head>
-        <body>
-            <h1>Swift File</h1>
-            <form action="/receive" method="post" enctype="multipart/form-data">
-                <label>
-                    Choose one or more files to upload:
-                    <input type="file" name="file" multiple>
-                </label>
-
-                <input type="submit" value="Upload">
-            </form>
-        </body>
-    </html>
-    "#,
-    )
+    Html(HTML_FORM)
 }
 
 async fn accept_form(State(state): State<AppState>, mut multipart: Multipart) -> Redirect {
