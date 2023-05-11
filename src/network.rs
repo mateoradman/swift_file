@@ -18,20 +18,21 @@ pub fn port_in_range(s: &str) -> Result<u16, String> {
     }
 }
 
-pub fn is_port_available(port: u16) -> bool {
+pub fn can_bind_to_port(port: u16) -> bool {
     let addr = format!("{LOCALHOST}:{port}");
     TcpListener::bind(addr).is_ok()
 }
 
 pub fn find_available_port(server_port: &mut u16, user_port: &Option<u16>) {
     if let Some(port) = user_port {
-        if is_port_available(*port) {
+        if can_bind_to_port(*port) {
             *server_port = *port;
             return;
         }
+        println!("Selected port {port} is not available. Searching for another available port...")
     }
     for port in PORT_RANGE {
-        if is_port_available(port) {
+        if can_bind_to_port(port) {
             *server_port = port;
             return;
         }
@@ -59,5 +60,13 @@ mod tests {
         let mut server_port: u16 = 0;
         find_available_port(&mut server_port, &None);
         assert!(port_in_range(&server_port.to_string()).is_ok());
+    }
+
+    #[test]
+    fn test_can_bind() {
+        let mut server_port: u16 = 0;
+        find_available_port(&mut server_port, &None);
+        let bindable = can_bind_to_port(server_port);
+        assert!(bindable);
     }
 }
