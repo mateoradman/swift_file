@@ -15,7 +15,7 @@ use axum::extract::DefaultBodyLimit;
 use axum::Router;
 use clap::Parser;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct AppState {
     pub uuid_path_map: Arc<Mutex<HashMap<String, PathBuf>>>,
     pub destination_dir: Option<PathBuf>,
@@ -26,9 +26,8 @@ pub struct AppState {
 async fn main() {
     // create shared state
     let mut shared_state = AppState {
-        uuid_path_map: Arc::new(Mutex::new(HashMap::new())),
-        destination_dir: None,
         auto_open: true,
+        ..Default::default()
     };
 
     let cli_args = Cli::parse();
