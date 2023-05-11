@@ -1,4 +1,4 @@
-use std::{net::TcpListener, ops::RangeInclusive};
+use std::{net::TcpListener, ops::RangeInclusive, process::exit};
 
 const PORT_RANGE: RangeInclusive<u16> = 1024..=49151; // user port range
 pub const LOCALHOST: &str = "0.0.0.0";
@@ -38,7 +38,8 @@ pub fn find_available_port(server_port: &mut u16, user_port: &Option<u16>) {
         }
     }
 
-    panic!("Unable to find an available port on the system.")
+    eprintln!("Unable to find an available port on the system.");
+    exit(1);
 }
 
 #[cfg(test)]
