@@ -44,7 +44,7 @@ async fn accept_form(State(state): State<AppState>, mut multipart: Multipart) ->
             }
         };
 
-        if written {
+        if written && state.auto_open {
             match opener::open(&dest_path) {
                 Ok(()) => println!("File opened using a system default program."),
                 Err(err) => {
