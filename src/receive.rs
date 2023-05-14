@@ -8,9 +8,9 @@ use axum::{
     Router,
 };
 
-use crate::{files::get_destination_path, AppState};
+use crate::{files::get_destination_path, GlobalConfig};
 
-pub fn router() -> Router<AppState> {
+pub fn router() -> Router<GlobalConfig> {
     Router::new().route("/receive", get(show_form).post(accept_form))
 }
 
@@ -19,7 +19,7 @@ async fn show_form() -> Html<&'static str> {
     Html(HTML_FORM)
 }
 
-async fn accept_form(State(state): State<AppState>, mut multipart: Multipart) -> Redirect {
+async fn accept_form(State(state): State<GlobalConfig>, mut multipart: Multipart) -> Redirect {
     while let Some(field) = multipart.next_field().await.unwrap() {
         let file_name = field.file_name().unwrap().to_string();
         let content_type = field.content_type().unwrap().to_string();

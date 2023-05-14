@@ -8,14 +8,14 @@ use axum::{
 
 use tokio_util::io::ReaderStream;
 
-use crate::AppState;
+use crate::GlobalConfig;
 
-pub fn router() -> Router<AppState> {
+pub fn router() -> Router<GlobalConfig> {
     Router::new().route("/download/:file_uuid", get(download_file))
 }
 
 async fn download_file(
-    State(state): State<AppState>,
+    State(state): State<GlobalConfig>,
     Path(file_uuid): Path<String>,
 ) -> impl IntoResponse {
     let file_path = match state.uuid_path_map.lock() {
