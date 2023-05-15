@@ -1,5 +1,6 @@
 use std::{
-    net::{IpAddr, TcpListener},
+    format,
+    net::{IpAddr, SocketAddr, TcpListener},
     ops::RangeInclusive,
     process::exit,
 };
@@ -18,23 +19,22 @@ pub fn is_ip_address_valid(s: &str) -> Result<String, String> {
     let address: IpAddr = s
         .parse()
         .map_err(|_| format!("{s} is not a valid IP address"))?;
-    Ok(address.to_string())
+    let socket = SocketAddr::new(address, 0);
+    match TcpListener::bind(socket) {
+        Ok(_) => Ok(s.to_string()),
+        Err(_) => Err(format!("Cannot bind to the provided IP address `{s}`")),
+    }
 }
 
-pub fn can_bind_to_port(port: u16) -> bool {
-    let addr = format!("{DEFAULT_ADDRESS}:{port}");
-    TcpListener::bind(addr).is_ok()
-}
-
-pub fn find_available_port(user_port: Option<u16>) -> u16 {
+pub fn find_available_port(ip: &str, user_port: Option<u16>) -> u16 {
     if let Some(port) = user_port {
-        if can_bind_to_port(port) {
+        if can_bind_to_port(ip, &port) {
             return port;
         }
         println!("Selected port {port} is not available. Searching for another available port...");
     }
     for port in PORT_RANGE {
-        if can_bind_to_port(port) {
+        if can_bind_to_port(ip, &port) {
             return port;
         }
     }
@@ -55,6 +55,11 @@ pub fn determine_ip(ip: String) -> String {
     }
 }
 
+fn can_bind_to_port(ip: &str, port: &u16) -> bool {
+    let addr = format!("{ip}:{port}");
+    TcpListener::bind(addr).is_ok()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -71,14 +76,14 @@ mod tests {
 
     #[test]
     fn test_find_available_port() {
-        let port = find_available_port(None);
+        let port = find_available_port(DEFAULT_ADDRESS, None);
         assert!(is_port_valid(&port.to_string()).is_ok());
     }
 
     #[test]
     fn test_can_bind() {
-        let port = find_available_port(None);
-        let bindable = can_bind_to_port(port);
+        let port = find_available_port(DEFAULT_ADDRESS, None);
+        let bindable = can_bind_to_port(DEFAULT_ADDRESS, &port);
         assert!(bindable);
     }
 }

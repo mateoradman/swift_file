@@ -16,7 +16,7 @@ pub struct GlobalConfig {
 impl GlobalConfig {
     pub fn new(ip_addr: String, port: Option<u16>) -> GlobalConfig {
         let ip = determine_ip(ip_addr);
-        let server_port = find_available_port(port);
+        let server_port = find_available_port(&ip, port);
         let socket_addr = SocketAddr::new(ip.parse().unwrap(), server_port);
         GlobalConfig {
             destination_dir: None,
