@@ -1,21 +1,21 @@
 use crate::{
-    network::{is_ip_address_valid, is_port_valid, DEFAULT_ADDRESS},
+    network::{is_ip_address_valid, is_network_interface_valid, is_port_valid},
     qr::generate_qr_code,
     GlobalConfig,
 };
 use clap::{Parser, Subcommand};
-use std::{path::PathBuf, process::exit};
+use std::{net::IpAddr, path::PathBuf, process::exit};
 use uuid::Uuid;
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
 pub struct Cli {
     /// IP Address to bind to
-    #[arg(short, long, default_value_t = DEFAULT_ADDRESS.to_string(), value_parser = is_ip_address_valid, global = true)]
-    addr: String,
-    /// Network interface to use
-    #[arg(short, long, global = true)]
-    interface: Option<String>,
+    #[arg(long, value_parser = is_ip_address_valid, global = true)]
+    ip: Option<IpAddr>,
+    /// Network interface to use (ignored if --ip provided)
+    #[arg(short, long, value_parser = is_network_interface_valid, global = true)]
+    interface: Option<default_net::Interface>,
     #[arg(short, long, value_parser = is_port_valid, global = true)]
     /// Server port
     port: Option<u16>,
@@ -25,7 +25,7 @@ pub struct Cli {
 
 impl Cli {
     pub fn into_config(self) -> GlobalConfig {
-        let mut global_config = GlobalConfig::new(self.addr.clone(), self.port);
+        let mut global_config = GlobalConfig::new(&self.ip, &self.interface, &self.port);
         let route = match &self.command {
             Commands::Send { file } => self.send(&global_config, file.clone()),
             Commands::Receive { dest_dir, no_open } => {

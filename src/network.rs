@@ -6,7 +6,6 @@ use std::{
 };
 
 const PORT_RANGE: RangeInclusive<u16> = 1024..=49151; // user port range
-pub const DEFAULT_ADDRESS: &str = "0.0.0.0";
 
 pub fn is_port_valid(s: &str) -> Result<u16, String> {
     let port: u16 = s
@@ -15,54 +14,94 @@ pub fn is_port_valid(s: &str) -> Result<u16, String> {
     Ok(port)
 }
 
-pub fn is_ip_address_valid(s: &str) -> Result<String, String> {
+pub fn is_ip_address_valid(s: &str) -> Result<IpAddr, String> {
     let address: IpAddr = s
         .parse()
-        .map_err(|_| format!("{s} is not a valid IP address"))?;
+        .map_err(|_| format!("{s} isn't a valid IP address"))?;
     let socket = SocketAddr::new(address, 0);
     match TcpListener::bind(socket) {
-        Ok(_) => Ok(s.to_string()),
-        Err(_) => Err(format!("Cannot bind to the provided IP address `{s}`")),
+        Ok(_) => Ok(address),
+        Err(_) => Err(format!("cannot bind to the provided IP address `{s}`")),
     }
 }
 
-pub fn find_available_port(ip: &str, user_port: Option<u16>) -> u16 {
-    if let Some(port) = user_port {
-        if can_bind_to_port(ip, &port) {
-            return port;
+pub fn is_network_interface_valid(s: &str) -> Result<default_net::Interface, String> {
+    for interface in default_net::get_interfaces() {
+        if interface.name == s {
+            if interface.ipv4.is_empty() && interface.ipv6.is_empty() {
+                return Err(format!(
+                    "interface {s} has no IPv4 or IPv6 address to bind to"
+                ));
+            }
+            return Ok(interface);
         }
-        println!("Selected port {port} is not available. Searching for another available port...");
     }
-    for port in PORT_RANGE {
-        if can_bind_to_port(ip, &port) {
-            return port;
-        }
-    }
-    eprintln!("Unable to find an available port on the system.");
-    exit(1);
+    Err(format!("{s} is not a valid interface name"))
 }
 
-pub fn determine_ip(ip: String) -> String {
-    if ip != DEFAULT_ADDRESS {
-        return ip;
+pub fn get_socket_addr(
+    ip: &Option<IpAddr>,
+    interface: &Option<default_net::Interface>,
+    port: &Option<u16>,
+) -> SocketAddr {
+    let ip_addr = match ip {
+        Some(addr) => *addr,
+        None => get_interface_ip(interface),
+    };
+    let server_port = find_available_port(&ip_addr, port);
+    SocketAddr::new(ip_addr, server_port)
+}
+
+fn get_interface_ip(interface: &Option<default_net::Interface>) -> IpAddr {
+    match interface {
+        Some(iface) => {
+            if iface.ipv4.is_empty() {
+                IpAddr::V6(iface.ipv6[0].addr)
+            } else {
+                IpAddr::V4(iface.ipv4[0].addr)
+            }
+        }
+        None => get_default_interface_ip(),
     }
+}
+
+fn get_default_interface_ip() -> IpAddr {
     match default_net::interface::get_local_ipaddr() {
-        Some(ip) => ip.to_string(),
+        Some(ip) => ip,
         None => {
-            eprintln!("unable to determine local IP address of the default network interface. Please provide a network interface or IP address");
+            eprintln!("Unable to get local IP address of a default network interface.");
             exit(1);
         }
     }
 }
 
-fn can_bind_to_port(ip: &str, port: &u16) -> bool {
-    let addr = format!("{ip}:{port}");
+fn find_available_port(ip: &IpAddr, user_port: &Option<u16>) -> u16 {
+    if let Some(port) = user_port {
+        if can_listen_on_port(ip, port) {
+            return *port;
+        }
+        println!("Selected port {port} is not available. Searching for another available port...");
+    }
+    for port in PORT_RANGE {
+        if can_listen_on_port(ip, &port) {
+            return port;
+        }
+    }
+    eprintln!("Unable to listen to any port on IP address {ip}.");
+    exit(1);
+}
+
+fn can_listen_on_port(ip: &IpAddr, port: &u16) -> bool {
+    let addr = SocketAddr::new(*ip, *port);
     TcpListener::bind(addr).is_ok()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::net::Ipv4Addr;
+
+    const DEFAULT_ADDRESS: IpAddr = IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0));
 
     #[test]
     fn test_is_port_valid() {
@@ -76,14 +115,14 @@ mod tests {
 
     #[test]
     fn test_find_available_port() {
-        let port = find_available_port(DEFAULT_ADDRESS, None);
+        let port = find_available_port(&DEFAULT_ADDRESS, &None);
         assert!(is_port_valid(&port.to_string()).is_ok());
     }
 
     #[test]
     fn test_can_bind() {
-        let port = find_available_port(DEFAULT_ADDRESS, None);
-        let bindable = can_bind_to_port(DEFAULT_ADDRESS, &port);
+        let port = find_available_port(&DEFAULT_ADDRESS, &None);
+        let bindable = can_listen_on_port(&DEFAULT_ADDRESS, &port);
         assert!(bindable);
     }
 }
