@@ -21,8 +21,11 @@ async fn show_form() -> Html<&'static str> {
 
 async fn accept_form(State(state): State<GlobalConfig>, mut multipart: Multipart) -> Redirect {
     while let Some(field) = multipart.next_field().await.unwrap() {
-        let file_name = field.file_name().unwrap().to_string();
-        let content_type = field.content_type().unwrap().to_string();
+        let file_name = field.file_name().unwrap_or("uploaded file").to_string();
+        let content_type = field
+            .content_type()
+            .unwrap_or("application/octet-stream")
+            .to_string();
         let data = field.bytes().await.unwrap();
         let human_size: String = format_size(data.len(), DECIMAL);
         let dest_path = get_destination_path(&file_name, &state.destination_dir);
