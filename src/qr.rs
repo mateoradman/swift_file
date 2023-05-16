@@ -11,6 +11,8 @@ pub fn generate_qr_code(server_addr: &SocketAddr, route: &str) {
         .dark_color(unicode::Dense1x2::Light)
         .light_color(unicode::Dense1x2::Dark)
         .build();
+    println!("Swift File server is warming up...");
+    println!("Scan the QR code to get started. Shut down the server by pressing \"Ctrl + c\"");
     println!("{complete_url}\n");
     println!("{}", image);
 }
