@@ -1,3 +1,4 @@
+use std::net::SocketAddr;
 use std::process::exit;
 
 use crate::config::GlobalConfig;
@@ -10,7 +11,10 @@ pub async fn start_server(config: GlobalConfig) {
     let app = build_router(config).await;
     match axum::Server::try_bind(&server_address) {
         Ok(server) => {
-            server.serve(app.into_make_service()).await.unwrap();
+            server
+                .serve(app.into_make_service_with_connect_info::<SocketAddr>())
+                .await
+                .unwrap();
         }
         Err(_) => {
             eprintln!("Unable to bind the server to IP address {server_address}");

@@ -1,8 +1,8 @@
 use humansize::{format_size, DECIMAL};
-use std::fs::write;
+use std::{fs::write, net::SocketAddr};
 
 use axum::{
-    extract::{Multipart, State},
+    extract::{ConnectInfo, Multipart, State},
     response::{Html, Redirect},
     routing::get,
     Router,
@@ -19,7 +19,11 @@ async fn show_form() -> Html<&'static str> {
     Html(HTML_FORM)
 }
 
-async fn accept_form(State(state): State<GlobalConfig>, mut multipart: Multipart) -> Redirect {
+async fn accept_form(
+    ConnectInfo(client_addr): ConnectInfo<SocketAddr>,
+    State(state): State<GlobalConfig>,
+    mut multipart: Multipart,
+) -> Redirect {
     while let Some(field) = multipart.next_field().await.unwrap() {
         let file_name = field.file_name().unwrap_or("uploaded file").to_string();
         let content_type = field
@@ -32,14 +36,16 @@ async fn accept_form(State(state): State<GlobalConfig>, mut multipart: Multipart
         let written: bool = match write(&dest_path, &data) {
             Ok(_) => {
                 println!(
-                    "Successfully transferred {}",
+                    "Client {} successfully transferred {}",
+                    &client_addr.ip(),
                     construct_file_info(&file_name, &content_type, &human_size, &dest_path),
                 );
                 true
             }
             Err(err) => {
                 println!(
-                    "Unable to transfer {} due to `{}`",
+                    "Client {} attempted to transfer {} but it failed due to `{}`",
+                    &client_addr.ip(),
                     construct_file_info(&file_name, &content_type, &human_size, &dest_path),
                     err
                 );
