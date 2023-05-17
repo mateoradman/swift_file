@@ -5,15 +5,14 @@ Tool is inspired by https://github.com/claudiodangelis/qrcp
 
 ## How does it work?
 
-The Axum server is bound to the local IP address of the machine the server is running on. The available port can be selected by providing the `--port` on the command line or it will be allocated automatically.
+The Axum server is bound to the IP address of a default network interface of the machine the server is running on. IP address and port, or particular network interface, can be selected by providing the `--port`, `--ip` or `--interface` on the command line.
 
-The QR code that is printed to stdout encodes a http url which is typically of the following format:
+The QR code that is printed to stdout encodes a http URL which is typically of the following format:
 
 `http://{ip}:{port}/{send|receive}/[optional suffix]`
 
 ## Current limitations
 
-- The maximum data that can be sent with each request is 1GB which should satisfy most users.
 - Some browsers on iOS are unable to download the file. It always works with Safari but fails with Brave. The failed download might also occur on other Chromium-based iOS browsers.
 
 ## Installation options
@@ -33,8 +32,12 @@ Download, extract and move the binary to the desired directory, and set executio
 
 ## CLI Usage
 
+### Sending a file to another device
+
 ```
-Usage: sf <COMMAND>
+Send or receive files between devices using Wi-Fi network
+
+Usage: sf [OPTIONS] <COMMAND>
 
 Commands:
   send     Send a file
@@ -42,23 +45,11 @@ Commands:
   help     Print this message or the help of the given subcommand(s)
 
 Options:
-  -h, --help     Print help
-  -V, --version  Print version
-```
-
-### Sending a file to another device
-
-```
-Send a file
-
-Usage: sf send [OPTIONS] <FILE>
-
-Arguments:
-  <FILE>  File path to send
-
-Options:
-  -p, --port <PORT>  Port to bind the server to (allowed user port range 1024 to 49151)
-  -h, --help         Print help
+      --ip <IP>                IP Address to bind to
+  -i, --interface <INTERFACE>  Network interface to use (ignored if --ip provided)
+  -p, --port <PORT>            Server port
+  -h, --help                   Print help
+  -V, --version                Print version
 ```
 
 ### Receiving a file from another device
@@ -69,8 +60,10 @@ Receive a file
 Usage: sf receive [OPTIONS]
 
 Options:
-  -d, --dest-dir <DEST_DIR>  Destination directory
-  -p, --port <PORT>          Port to bind the server to (allowed user port range 1024 to 49151)
-      --no-open              Disable opening the received file automatically using the system default program
-  -h, --help                 Print help
+  -d, --dest-dir <DEST_DIR>    Destination directory
+      --ip <IP>                IP Address to bind to
+  -i, --interface <INTERFACE>  Network interface to use (ignored if --ip provided)
+      --no-open                Disable opening the received file automatically using the system default program
+  -p, --port <PORT>            Server port
+  -h, --help                   Print help
 ```

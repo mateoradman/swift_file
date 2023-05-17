@@ -29,13 +29,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_get_available_filename() {
+    fn test_set_available_filename() {
         let mut filename = PathBuf::from("bla");
         set_available_filename(&mut filename);
         assert_eq!(filename, PathBuf::from("bla"));
     }
     #[test]
-    fn test_get_available_filename_appends_timestamp() {
+    fn test_set_available_filename_appends_timestamp() {
         let mut working_dir = env::current_dir().unwrap();
         set_available_filename(&mut working_dir);
         let cwd = env::current_dir().unwrap();

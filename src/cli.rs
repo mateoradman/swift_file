@@ -1,63 +1,69 @@
 use crate::{
-    network::{find_available_port, port_in_range},
+    network::{is_ip_address_valid, is_network_interface_valid, is_port_valid},
     qr::generate_qr_code,
-    AppState,
+    GlobalConfig,
 };
 use clap::{Parser, Subcommand};
-use std::path::PathBuf;
+use std::{net::IpAddr, path::PathBuf, process::exit};
 use uuid::Uuid;
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
 pub struct Cli {
+    /// IP Address to bind to
+    #[arg(long, value_parser = is_ip_address_valid, global = true)]
+    ip: Option<IpAddr>,
+    /// Network interface to use (ignored if --ip provided)
+    #[arg(short, long, value_parser = is_network_interface_valid, global = true)]
+    interface: Option<default_net::Interface>,
+    #[arg(short, long, value_parser = is_port_valid, global = true)]
+    /// Server port
+    port: Option<u16>,
     #[command(subcommand)]
-    pub command: Commands,
+    command: Commands,
 }
 
 impl Cli {
-    pub fn decide(&self, server_port: &mut u16, shared_state: &mut AppState) {
-        match &self.command {
-            Commands::Send { file, port } => {
-                self.send(server_port, shared_state, file.clone(), port)
+    pub fn into_config(self) -> GlobalConfig {
+        let mut global_config = GlobalConfig::new(&self.ip, &self.interface, &self.port);
+        let route = match &self.command {
+            Commands::Send { file } => self.send(&global_config, file.clone()),
+            Commands::Receive { dest_dir, no_open } => {
+                self.receive(&mut global_config, dest_dir, no_open)
             }
-            Commands::Receive {
-                dest_dir,
-                port,
-                no_open,
-            } => self.receive(server_port, shared_state, dest_dir, port, no_open),
         };
+        generate_qr_code(&global_config.socket_addr, &route);
+        global_config
     }
 
-    fn send(
-        &self,
-        server_port: &mut u16,
-        shared_state: &AppState,
-        file: PathBuf,
-        port: &Option<u16>,
-    ) {
-        find_available_port(server_port, port);
+    fn send(&self, global_config: &GlobalConfig, file: PathBuf) -> String {
         let uuid = Uuid::new_v4().to_string();
-        shared_state
+        global_config
             .uuid_path_map
             .lock()
-            .expect("shared state was poisoned")
+            .expect("global state already locked in the same thread")
             .insert(uuid.clone(), file);
-        let route = format!("/download/{uuid}");
-        generate_qr_code(server_port, &route);
+        format!("/download/{uuid}")
     }
 
     fn receive(
         &self,
-        server_port: &mut u16,
-        shared_state: &mut AppState,
+        global_config: &mut GlobalConfig,
         dest_dir: &Option<PathBuf>,
-        port: &Option<u16>,
         no_open: &bool,
-    ) {
-        find_available_port(server_port, port);
-        shared_state.destination_dir = dest_dir.clone();
-        shared_state.auto_open = !no_open;
-        generate_qr_code(server_port, "/receive");
+    ) -> String {
+        if let Some(path) = dest_dir {
+            if !path.is_dir() {
+                eprintln!(
+                    "Destination directory must exist but {} does not exist",
+                    path.display()
+                );
+                exit(1);
+            }
+            global_config.destination_dir = dest_dir.clone();
+        }
+        global_config.auto_open = !no_open;
+        String::from("/receive")
     }
 }
 
@@ -67,9 +73,6 @@ pub enum Commands {
     Send {
         /// File path to send
         file: PathBuf,
-        #[arg(short, long, value_parser = port_in_range)]
-        /// Port to bind the server to (allowed user port range 1024 to 49151)
-        port: Option<u16>,
     },
 
     /// Receive a file
@@ -77,10 +80,7 @@ pub enum Commands {
         #[arg(short, long)]
         /// Destination directory
         dest_dir: Option<PathBuf>,
-        #[arg(short, long, value_parser = port_in_range)]
-        /// Port to bind the server to (allowed user port range 1024 to 49151)
-        port: Option<u16>,
-        #[arg(long)]
+        #[arg(long, default_value_t = false)]
         /// Disable opening the received file automatically using the system default program
         no_open: bool,
     },
