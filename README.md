@@ -94,62 +94,54 @@ sf --help
 ## CLI Usage
 
 ```
-
 Send or receive files between devices using Wi-Fi network
 
 Usage: sf [OPTIONS] <COMMAND>
 
 Commands:
-send Send a file
-receive Receive a file
-help Print this message or the help of the given subcommand(s)
+  send     Send a file
+  receive  Receive a file
+  help     Print this message or the help of the given subcommand(s)
 
 Options:
---ip <IP> IP Address to bind to
--i, --interface <INTERFACE> Network interface to use (ignored if --ip provided)
--p, --port <PORT> Server port
--h, --help Print help
--V, --version Print version
-
+      --ip <IP>                IP Address to bind to
+  -i, --interface <INTERFACE>  Network interface to use (ignored if --ip provided)
+  -p, --port <PORT>            Server port
+  -h, --help                   Print help
+  -V, --version                Print version
 ```
 
 ### Sending a file to another device
 
 ```
-
 Send a file
 
 Usage: sf send [OPTIONS] <FILE>
 
 Arguments:
-<FILE> File path to send
+  <FILE>  File path to send
 
 Options:
---ip <IP> IP Address to bind to
--i, --interface <INTERFACE> Network interface to use (ignored if --ip provided)
--p, --port <PORT> Server port
--h, --help Print help
+      --ip <IP>                IP Address to bind to
+  -i, --interface <INTERFACE>  Network interface to use (ignored if --ip provided)
+  -p, --port <PORT>            Server port
+  -h, --help                   Print help
 
 ```
 
 ### Receiving a file from another device
 
 ```
-
 Receive a file
 
 Usage: sf receive [OPTIONS]
 
 Options:
--d, --dest-dir <DEST_DIR> Destination directory
---no-open Disable opening the received file automatically using the system default program
---ip <IP> IP Address to bind to
--i, --interface <INTERFACE> Network interface to use (ignored if --ip provided)
--p, --port <PORT> Server port
--h, --help Print help
-
-```
-
-```
+  -d, --dest-dir <DEST_DIR>    Destination directory
+      --ip <IP>                IP Address to bind to
+  -i, --interface <INTERFACE>  Network interface to use (ignored if --ip provided)
+      --no-open                Disable opening the received file automatically using the system default program
+  -p, --port <PORT>            Server port
+  -h, --help                   Print help
 
 ```
