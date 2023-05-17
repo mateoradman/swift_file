@@ -114,6 +114,21 @@ mod tests {
     }
 
     #[test]
+    fn test_is_ip_valid() {
+        assert!(is_ip_address_valid("0.0.0.0").is_ok());
+    }
+
+    #[test]
+    fn test_is_ip_valid_fails() {
+        assert!(is_ip_address_valid("blabla").is_err());
+    }
+
+    #[test]
+    fn test_is_network_interface_valid_fails() {
+        assert!(is_network_interface_valid("blabla").is_err());
+    }
+
+    #[test]
     fn test_find_available_port() {
         let port = find_available_port(&DEFAULT_ADDRESS, &None);
         assert!(is_port_valid(&port.to_string()).is_ok());
