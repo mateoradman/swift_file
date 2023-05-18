@@ -75,7 +75,7 @@ pub enum Commands {
         file: PathBuf,
     },
 
-    /// Receive a file
+    /// Receive files
     Receive {
         #[arg(short, long)]
         /// Destination directory

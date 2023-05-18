@@ -129,10 +129,10 @@ Options:
 
 ```
 
-### Receiving a file from another device
+### Receiving files from another device
 
 ```
-Receive a file
+Receive files
 
 Usage: sf receive [OPTIONS]
 
