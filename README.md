@@ -5,13 +5,13 @@ Tool is inspired by https://github.com/claudiodangelis/qrcp
 
 ## How does it work?
 
-The Axum server is bound to the IP address of a default network interface of the machine the server is running on. IP address and port, or particular network interface, can be selected by providing the `--port`, `--ip` or `--interface` on the command line.
+The sf server is bound to the IP address of a default network interface of the machine the server is running on. Alternatively, the IP address (`--port`), particular network interface (`--interface`), and port (`--port`) can be selected by the user.
 
-The QR code that is printed to stdout encodes a http URL which is typically of the following format:
+The QR code that is printed encodes a http URL which is typically of the following format:
 
-`http://{ip}:{port}/{send|receive}/[optional suffix]`
+`http://{ip}:{port}/{download|receive}/[optional suffix]`
 
-## Current limitations
+## Known limitations
 
 - Some browsers on iOS are unable to download the file. It always works with Safari but fails with Brave. The failed download might also occur on other Chromium-based iOS browsers.
 
