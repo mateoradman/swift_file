@@ -17,7 +17,7 @@ The QR code that is printed encodes a http URL which is typically of the followi
 
 ## Safety
 
-This crate uses #![forbid(unsafe_code)] to ensure everything is implemented in 100% safe Rust.
+This crate uses `#![forbid(unsafe_code)]` to ensure everything is implemented in 100% safe Rust.
 
 ## Installation options
 
