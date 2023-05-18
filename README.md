@@ -1,7 +1,7 @@
 # swift_file
 
 Rust implementation of transferring files between devices over Wi-Fi network using a QR code.
-Tool is inspired by https://github.com/claudiodangelis/qrcp
+Tool is inspired by [claudiodangelis/qrcp](https://github.com/claudiodangelis/qrcp).
 
 ## How does it work?
 
@@ -15,12 +15,16 @@ The QR code that is printed encodes a http URL which is typically of the followi
 
 - Some browsers on iOS are unable to download the file. It always works with Safari but fails with Brave. The failed download might also occur on other Chromium-based iOS browsers.
 
+## Safety
+
+This crate uses #![forbid(unsafe_code)] to ensure everything is implemented in 100% safe Rust.
+
 ## Installation options
 
 ### Install with cargo
 
-swift_file is published on crates.io (https://crates.io/crates/swift_file) and can be directly installed.
-In order to install from crates.io, it is required to have Rust and cargo installed on your system.
+[swift_file](https://crates.io/crates/swift_file) is published on crates.io.
+In order to install a Rust crate from crates.io, it is required to have [Rust and cargo installed](https://doc.rust-lang.org/cargo/getting-started/installation.html) on your system.
 
 ```sh
 cargo install swift_file
@@ -33,7 +37,7 @@ Download, extract and move the binary to the desired directory, and set executio
 
 #### Linux
 
-1. Download the linux archive from [Latest release](https://github.com/mateoradman/swift_file/releases/latest)
+1. Download the Linux tar.gz archive from the latest [release](https://github.com/mateoradman/swift_file/releases/latest)
 2. Extract the archive
 
 ```sh
@@ -60,7 +64,7 @@ sf --help
 
 #### MacOS
 
-1. Download the Apple darwin archive from [Latest release](https://github.com/mateoradman/swift_file/releases/latest)
+1. Download the MacOS (apple-darwin) ZIP archive from the latest [release](https://github.com/mateoradman/swift_file/releases/latest)
 2. Extract the archive
 
 ```sh
@@ -87,7 +91,7 @@ sf --help
 
 #### Windows
 
-1. Download the Windows archive from [Latest release](https://github.com/mateoradman/swift_file/releases/latest)
+1. Download the Windows ZIP archive from the latest [release](https://github.com/mateoradman/swift_file/releases/latest)
 2. Extract the archive
 3. Run sf.exe
 
@@ -126,7 +130,6 @@ Options:
   -i, --interface <INTERFACE>  Network interface to use (ignored if --ip provided)
   -p, --port <PORT>            Server port
   -h, --help                   Print help
-
 ```
 
 ### Receiving files from another device
@@ -143,5 +146,4 @@ Options:
       --no-open                Disable opening the received file automatically using the system default program
   -p, --port <PORT>            Server port
   -h, --help                   Print help
-
 ```
