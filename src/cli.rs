@@ -27,7 +27,7 @@ impl Cli {
     pub fn into_config(self) -> GlobalConfig {
         let mut global_config = GlobalConfig::new(&self.ip, &self.interface, &self.port);
         let route = match &self.command {
-            Commands::Send { file } => self.send(&global_config, file.clone()),
+            Commands::Send { path, zip } => self.send(&mut global_config, path.clone(), zip),
             Commands::Receive { dest_dir, no_open } => {
                 self.receive(&mut global_config, dest_dir, no_open)
             }
@@ -36,13 +36,23 @@ impl Cli {
         global_config
     }
 
-    fn send(&self, global_config: &GlobalConfig, file: PathBuf) -> String {
+    fn send(&self, global_config: &mut GlobalConfig, path: PathBuf, zip: &bool) -> String {
+        if !path.exists() {
+            eprintln!("Path {} does not exist on disk", path.to_str().unwrap());
+            exit(1)
+        }
+        if path.is_dir() && !zip {
+            eprintln!("Unable to send a directory without creating a zip. Tip: use --zip");
+            exit(1)
+        }
+
         let uuid = Uuid::new_v4().to_string();
         global_config
             .uuid_path_map
             .lock()
             .expect("global state already locked in the same thread")
-            .insert(uuid.clone(), file);
+            .insert(uuid.clone(), path);
+        global_config.zip = *zip;
         format!("/download/{uuid}")
     }
 
@@ -69,10 +79,13 @@ impl Cli {
 
 #[derive(Debug, Subcommand)]
 pub enum Commands {
-    /// Send a file
+    /// Send a file or directory
     Send {
-        /// File path to send
-        file: PathBuf,
+        /// Path to a file (or directory if using --zip)
+        path: PathBuf,
+        #[arg(long, default_value_t = false)]
+        /// ZIP file or directory before transferring
+        zip: bool,
     },
 
     /// Receive files
