@@ -5,38 +5,39 @@ use std::{
     process::exit,
 };
 
+use anyhow::{anyhow, Context, Ok, Result};
+
 const PORT_RANGE: RangeInclusive<u16> = 1024..=49151; // user port range
 
-pub fn is_port_valid(s: &str) -> Result<u16, String> {
+pub fn is_port_valid(s: &str) -> Result<u16> {
     let port: u16 = s
         .parse()
-        .map_err(|_| format!("`{s}` isn't a port number"))?;
+        .with_context(|| format!("`{s}` isn't a port number"))?;
     Ok(port)
 }
 
-pub fn is_ip_address_valid(s: &str) -> Result<IpAddr, String> {
+pub fn is_ip_address_valid(s: &str) -> Result<IpAddr> {
     let address: IpAddr = s
         .parse()
-        .map_err(|_| format!("{s} isn't a valid IP address"))?;
+        .with_context(|| format!("{s} isn't a valid IP address"))?;
     let socket = SocketAddr::new(address, 0);
-    match TcpListener::bind(socket) {
-        Ok(_) => Ok(address),
-        Err(_) => Err(format!("cannot bind to the provided IP address `{s}`")),
-    }
+    TcpListener::bind(socket)
+        .with_context(|| format!("cannot bind to the provided IP address `{s}`"))?;
+    Ok(address)
 }
 
-pub fn is_network_interface_valid(s: &str) -> Result<default_net::Interface, String> {
+pub fn is_network_interface_valid(s: &str) -> Result<default_net::Interface> {
     for interface in default_net::get_interfaces() {
         if interface.name == s {
             if interface.ipv4.is_empty() && interface.ipv6.is_empty() {
-                return Err(format!(
+                return Err(anyhow!(
                     "interface {s} has no IPv4 or IPv6 address to bind to"
                 ));
             }
             return Ok(interface);
         }
     }
-    Err(format!("{s} is not a valid interface name"))
+    Err(anyhow!("{s} is not a valid interface name"))
 }
 
 pub fn get_socket_addr(
