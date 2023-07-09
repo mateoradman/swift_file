@@ -111,7 +111,6 @@ Commands:
 
 Options:
       --ip <IP>                IP Address to bind to
-      --zip                    ZIP file or directory before transferring
   -i, --interface <INTERFACE>  Network interface to use (ignored if --ip provided)
   -p, --port <PORT>            Server port
   -h, --help                   Print help
@@ -130,6 +129,7 @@ Arguments:
 
 Options:
       --ip <IP>                IP Address to bind to
+      --zip                    ZIP file or directory before transferring
   -i, --interface <INTERFACE>  Network interface to use (ignored if --ip provided)
   -p, --port <PORT>            Server port
   -h, --help                   Print help
