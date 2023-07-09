@@ -7,7 +7,6 @@ Tool is inspired by [claudiodangelis/qrcp](https://github.com/claudiodangelis/qr
 
 ![](docs/demo-screenshot.png?raw=true)
 
-
 The sf server is bound to the IP address of a default network interface of the machine the server is running on. Alternatively, the IP address (`--port`), particular network interface (`--interface`), and port (`--port`) can be selected by the user.
 
 The QR code that is printed encodes a http URL which is typically of the following format:
@@ -112,6 +111,7 @@ Commands:
 
 Options:
       --ip <IP>                IP Address to bind to
+      --zip                    ZIP file or directory before transferring
   -i, --interface <INTERFACE>  Network interface to use (ignored if --ip provided)
   -p, --port <PORT>            Server port
   -h, --help                   Print help
