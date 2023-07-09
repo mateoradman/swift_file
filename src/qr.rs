@@ -3,7 +3,7 @@ use std::net::SocketAddr;
 use qrcode::render::unicode;
 use qrcode::QrCode;
 
-pub fn generate_qr_code(server_addr: &SocketAddr, route: &str) {
+pub async fn generate_qr_code(server_addr: &SocketAddr, route: &str) {
     let complete_url = format!("http://{server_addr}{route}");
     let code = QrCode::new(&complete_url).unwrap();
     let image = code

@@ -10,6 +10,7 @@ pub struct GlobalConfig {
     pub uuid_path_map: Arc<Mutex<HashMap<String, PathBuf>>>,
     pub destination_dir: Option<PathBuf>,
     pub auto_open: bool,
+    pub zip: bool,
     pub socket_addr: SocketAddr,
 }
 
@@ -23,6 +24,7 @@ impl GlobalConfig {
         GlobalConfig {
             destination_dir: None,
             auto_open: true,
+            zip: false,
             socket_addr,
             uuid_path_map: Arc::new(Mutex::new(HashMap::new())),
         }

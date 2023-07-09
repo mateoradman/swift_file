@@ -15,7 +15,7 @@ use clap::Parser;
 #[tokio::main]
 async fn main() {
     let cli_args = Cli::parse();
-    let config = cli_args.into_config();
+    let config = cli_args.into_config().await;
     start_server(config).await;
 }
 

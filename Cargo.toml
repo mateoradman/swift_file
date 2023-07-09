@@ -17,6 +17,8 @@ name = "sf"
 path = "src/main.rs"
 
 [dependencies]
+anyhow = "1.0.71"
+async_zip = { version = "0.0.15", features = ["full"] }
 axum = { version = "0.6.15", features = ["multipart"] }
 chrono = "0.4.24"
 clap = { version = "4.2.2", features = ["derive"] }
