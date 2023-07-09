@@ -1,4 +1,5 @@
 use crate::{
+    files,
     network::{is_ip_address_valid, is_network_interface_valid, is_port_valid},
     qr::generate_qr_code,
     GlobalConfig,
@@ -24,19 +25,19 @@ pub struct Cli {
 }
 
 impl Cli {
-    pub fn into_config(self) -> GlobalConfig {
+    pub async fn into_config(self) -> GlobalConfig {
         let mut global_config = GlobalConfig::new(&self.ip, &self.interface, &self.port);
         let route = match &self.command {
-            Commands::Send { path, zip } => self.send(&mut global_config, path.clone(), zip),
+            Commands::Send { path, zip } => self.send(&mut global_config, path.clone(), zip).await,
             Commands::Receive { dest_dir, no_open } => {
-                self.receive(&mut global_config, dest_dir, no_open)
+                self.receive(&mut global_config, dest_dir, no_open).await
             }
         };
-        generate_qr_code(&global_config.socket_addr, &route);
+        generate_qr_code(&global_config.socket_addr, &route).await;
         global_config
     }
 
-    fn send(&self, global_config: &mut GlobalConfig, path: PathBuf, zip: &bool) -> String {
+    async fn send(&self, global_config: &mut GlobalConfig, path: PathBuf, zip: &bool) -> String {
         if !path.exists() {
             eprintln!("Path {} does not exist on disk", path.to_str().unwrap());
             exit(1)
@@ -46,17 +47,35 @@ impl Cli {
             exit(1)
         }
 
+        let mut file_path = path.clone();
+        if *zip {
+            let file_stem = match path.file_stem() {
+                Some(val) => val.to_str().unwrap_or("file"),
+                None => {
+                    eprintln!("Unable to determine file stem from the provided file path");
+                    exit(1)
+                }
+            };
+            file_path = match files::create_archive(file_stem, &path).await {
+                Ok(path) => path,
+                Err(err) => {
+                    eprintln!("Unable to create a zip file from {file_stem} due to {err}");
+                    exit(1)
+                }
+            };
+        }
+
         let uuid = Uuid::new_v4().to_string();
         global_config
             .uuid_path_map
             .lock()
             .expect("global state already locked in the same thread")
-            .insert(uuid.clone(), path);
+            .insert(uuid.clone(), file_path);
         global_config.zip = *zip;
         format!("/download/{uuid}")
     }
 
-    fn receive(
+    async fn receive(
         &self,
         global_config: &mut GlobalConfig,
         dest_dir: &Option<PathBuf>,
